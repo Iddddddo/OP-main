@@ -1,0 +1,5 @@
+s=input()
+print('a: ', s[:4])
+print('b: ', s[-4:])
+print('c: ', s[len(s)//2])
+print('d: ', s[2:8])
