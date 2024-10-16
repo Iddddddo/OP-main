@@ -5,7 +5,7 @@ def chk(j, prims):
     prims.append(j)
     return prims
 
-n=int(input("ВВедите n: "))
+n=int(input("Введите n: "))
 i=1
 while i*7<=n:
     print(i*7, end=', ')
