@@ -22,26 +22,16 @@ n, k = map(int, input('Введите n и k: ').split())
 """
 Ввод графа
 """
-print("Выберите способ ввода графа:\n1) Матрица смежности\n2) Описание связей для каждой вершины\n3) Рандомно сгенерировать")
+print("Выберите способ ввода графа:\n1) Матрица смежности\n2) Рандомно сгенерировать\n3) Матрица инцидентности")
 var_input=int(input("Вариант "))
-graf=[]
+graf=[[0 for i in range(n)]for i in range(n)]
 if var_input==1:
-    print("Вводите каждую строку матрицы смежности, разделяя числа запятой без пробелов:")
+    print("Вводите каждую строку матрицы смежности, разделяя числа пробелом:")
     for i in range(n):
-        a=input().split(',')
+        a=input().split(' ')
         graf.append(a)
     time.sleep(1)
-elif var_input==2:
-    print("Поочередно введите в строку через пробел с вершинами под каким номером имеет связь каждая вершина, \nесли связей несколько - введите номер вершины несколько раз, \nесли связь петля - то введите тот же номер вершины")
-    for i in range(1,n+1):
-        print(f'Введите связи для вершины №{i}: ', end='')
-        a=input().split()
-        graf_matr=[0 for i in range(n)]
-        for j in a:
-            graf_matr[int(j)-1]+=1
-        graf.append(graf_matr)
-        time.sleep(0.5)
-else:
+elif var_input == 2:
     print('Граф будет сгенерирован автоматически')
     graf=[[0 for i in range(n)]for j in range(n)]
     max_connect=max(k//(2*n), 1)
@@ -62,12 +52,33 @@ else:
         if b>=a:
             graf[a][b]+=1
             count+=1
-graf=rep(graf, n)
+elif var_input==3:
+    print('Введите матрицу инцидентности')
+    print("*", end='  ')
+    for i in range(k):
+        print(f'{i}', end=' ')
+    print('')
+    edges=[[0 for i in range(n)]for j in range(n)]
+    for i in range(n):
+        print(f'{i}: ', end='')
+        edges[i]=input().split()
 
-#Вывод
-print("Ваша матрица смежности:")
-for x in graf:
-    print(x)
+if var_input != 4: graf=rep(graf, n)
+else:
+    for j in range(k):
+        fv=-1
+        sv=-1
+        for i in range(n):
+            if edges[i][j]=='1' and fv==-1:
+                fv=i
+            elif edges[i][j]=='1' and fv!=-1:
+                sv=i
+                graf[fv][sv]+=1
+                graf[sv][fv]+=1
+                fv=-1
+                sv=-1
+            elif edges[i][j]=='2':
+                graf[i][i]+=1
 
 #Ребра
 edge_1=[]#В i-ой ячейке одна часть ребра
@@ -84,48 +95,31 @@ for i in range(n):
 #Задание 1
 print("\n------------------------\n")
 print("Ответ на первое задание:")
-four=0
+vers=[0 for i in range(n)]
+five=[0 for i in range(n)]
 for i in range(n):
-    exes=[]
-    vers=i+1
-    print(f"Инцедентные ребра для вершины {vers}: ", end='')
-    s=[]
-    for j in range(len(edge_1)):
-        if edge_1[j]==i and edge_2[j] not in exes:
-            print(edge_2[j]+1, end=' ')
-            s.append(edge_2[j]+1)
-            exes.append(edge_2[j])
-    if len(s)==1:
-        four+=1 #Счётчик для четвертого задания
-    print()
+    print(f'Вершине {i} инцеденты ребра: ', end='')
+    for j in range(k):
+        if edges[i][j]!='0':
+            print(j,end=' ')
+            vers[i]+=1
+            five[i]+=1
+        if edges[i][j]=='2':
+            vers[i]+=1
+    print('')
 time.sleep(0.5)
 
 #Задание 2
 print("\n------------------------\n")
 print("Ответ на второе задание:")
-zer=False
-inces=[[] for i in range(n)]
-
-for i in range(n): #Тус создаю список длины n, в i-ой ячейке лежат вершины, с которыми имеет связь i-ая вершина
-    for j in range(len(edge_1)):
-        if edge_1[j]==i:
-            inces[i].append(edge_2[j])
-
-for i in range(len(inces)):
-    s=0
-    for j in range(len(inces[i])):
-        s+=1
-        if i==inces[i][j]:
-            s+=1
-    print(f'У вершины {i+1} - {s//2} связей')
-    if s == 0:
-        zer=True #Это мы сразу ищем вершину с нулём для третьего задания
+for i in range(len(vers)):
+    print(f'Степень вершины {i} = {vers[i]}')
 time.sleep(0.5)
 
 #Задание 3
 print("\n------------------------\n")
 print("Ответ на третье задание:")
-if zer:
+if 0 in vers:
     print('Существует вершина со степенью 0')
 else:
     print('Не существует вершины со степенью 0')
@@ -134,20 +128,17 @@ time.sleep(0.5)
 #Задание 4
 print("\n------------------------\n")
 print("Ответ на четвертое задание:")
-print(f"{four} вершин инцидентно только одному ребру")
+four=0
+for i in edges:
+    if i.count('1')+i.count('2')==1:
+        four+=1
+print(f'{four} вершин инцедентны только одному ребру')
 time.sleep(0.5)
 
 #Задание 5
 print("\n------------------------\n")
 print("Ответ на пятое задание:")
-five=[0 for i in range(n)]
-for i in range(len(edge_1)):
-    if edge_1[i]==edge_2[i]:
-        five[edge_1[i]]+=1
-for i in five:
-    if i==max(five):
-        print(f'Максимальное количество смежных между собой ребер, инцидентных одной и той же вершине - {i}')
-        break
+print(f'максимум смежных ребер, инцедентных одной вершине - {max(five)}')
 time.sleep(0.5)
 
 #Задание 6
